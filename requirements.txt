@@ -7,3 +7,12 @@ Pillow
 tensorflow
 opencv-python
 torchvision
+torch
+pandas
+tqdm
+facenet_pytorch
+scikit-image
+scikit-learn
+matplotlib
+seaborn
+timm

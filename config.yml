@@ -1,0 +1,113 @@
+assets: "assets"
+data_path:
+  dfdc:
+    train: "/content/drive/MyDrive/InputTraining"
+    valid: "/content/drive/MyDrive/InputTraining"
+    test: "/content/drive/MyDrive/InputTraining"
+    train_labels_csv_filename: "train_labels.csv"
+    valid_labels_csv_filename: "labels.csv"
+    test_labels_csv_filename: "labels.csv"
+    train_frame_labels_csv_filename: "train_frame_labels.csv"
+    valid_frame_labels_csv_filename: "valid_frame_labels.csv"
+    test_frame_labels_csv_filename: "test_frame_labels.csv"
+    data_augmentation:
+      plan_pkl_filename: "data_augmentation_plan.pkl"
+      metadata: "aug_metadata"
+  celeb_df_v2:
+    real: "/home/therock/data2/data_workset/deepfake_data/Celeb-DF-v2/Celeb-real"
+    fake: "/home/therock/data2/data_workset/deepfake_data/Celeb-DF-v2/Celeb-synthesis"
+    real_fake_mapping: "celeb_df_v2_real_fake_mapping.json"
+  fdf:
+    data_path: "/home/therock/data2/data_workset/deepfake_data/fdf/cc-by-nc-sa-2/128"
+  ffhq:
+    data_path: "/content/drive/MyDrive/InputTraining/00000"
+features:
+  dfdc:
+    landmarks_path:
+      train: "/content/drive/MyDrive/InputTraining/landmarks"
+      valid: "/content/drive/MyDrive/InputTraining/landmarks"
+      test: "/content/drive/MyDrive/InputTraining/landmarks"
+    crop_faces:
+      train: "/content/drive/MyDrive/InputTraining/cropspath"
+      valid: "/content/drive/MyDrive/InputTraining/cropspath"
+      test: "/content/drive/MyDrive/InputTraining/cropspath"
+    mri_metadata_csv: "dfdc_mri_metadata.csv"
+    mri_path: "/content/drive/MyDrive/InputTraining/mri"
+    train_mrip2p_faces: "/content/drive/MyDrive/InputTraining/mri/train"
+    valid_mrip2p_faces: "/content/drive/MyDrive/InputTraining/mri/valid"
+    test_mrip2p_faces: "/content/drive/MyDrive/InputTraining/mri/test"
+    train_mriframe_label: "/content/drive/MyDrive/InputTraining/mri/train/metadata_train.csv"
+    valid_mriframe_label: "/content/drive/MyDrive/InputTraining/mri/valid/metadata_valid.csv"
+    test_mriframe_label: "/content/drive/MyDrive/InputTraining/mri/test/metadata_test.csv"
+  celeb_df_v2:
+    landmarks_path:
+      train: "/home/therock/data2/data_workset/deepfake_data/Celeb-DF-v2/landmarks"
+    crop_faces:
+      train: "/home/therock/data2/data_workset/deepfake_data/Celeb-DF-v2/crop_faces/train"
+    mri_metadata_csv: "celeb_df_v2_mri_metadata.csv"
+    mri_path: "/home/therock/data2/data_workset/deepfake_data/Celeb-DF-v2/mri"
+  fdf:
+    json_filename: "/content/drive/MyDrive/InputTraining/jsonfilename/ffhq-dataset-v2.json"
+    crops_path: "/content/drive/MyDrive/InputTraining/cropspath"
+  ffhq:
+    json_filename: "/content/drive/MyDrive/InputTraining/jsonfilename/ffhq-dataset-v2.json/ffhq-dataset-v2.json"
+    crops_path: "/home/therock/data2/data_workset/deepfake_data/ffhq/images1024x1024_crops"
+  mri_dataset_real_train_csv: "mri_real_train_dataset.csv"
+  mri_dataset_fake_train_csv: "mri_fake_train_dataset.csv"
+  mri_dataset_real_test_csv: "mri_real_test_dataset.csv"
+  mri_dataset_fake_test_csv: "mri_fake_test_dataset.csv"
+  mri_dataset_csv: "mri_dataset.csv"
+  blank_png: "blank.png"
+MRI_GAN:
+  weights: "./checkpoint_best_G.chkpt"
+  model_params:
+    image_path: "/content/drive/MyDrive/InputTraining/dataset/faces_224"
+    image_csv_path: "/content/drive/MyDrive/InputTraining/dataset/metadata.csv"
+    n_epochs: 12
+    batch_size: 64
+    lambda_pixel: 100
+    b1: 0.5
+    b2: 0.999
+    lr: 0.0001
+    tau: 0.3
+    imsize: 256
+    model_name: "MRI_GAN"
+    test_sample_size: 16
+    chkpt_freq: 500
+    sample_gen_freq: 200
+    frac: 1 # fraction of data to use (with respect to real data)
+    losses_file: "losses.pkl"
+    metadata_file: "mri_metadata.pkl"
+    ssim_report_file: "ssim_report_file.pkl"
+cnn_encoder:
+  default: "tf_efficientnet_b0_ns"
+deep_fake:
+  training:
+    train_size: 1
+    valid_size: 1
+    test_size: 1
+    model_params:
+      model_name: "DeepFakeDetectModel"
+      label_smoothing: 0.1
+      train_transform: "simple" # simple or complex
+      batch_format: "simple"
+      epochs: 2
+      learning_rate: 0.001
+      batch_size: 64
+      fp16: True
+      opt_level: "O0"
+      dataset: "mri"
+logging:
+  root_log_dir: logs
+  line_len: 80
+  model_info_log: "model_info_and_results.log"
+  model_loss_info_log: "model_losses.log"
+  model_acc_info_log: "model_acc.log"
+  model_conf_matrix_csv: "confusion_matrix.csv"
+  model_conf_matrix_png: "confusion_matrix.png"
+  model_conf_matrix_normalized_csv: "confusion_matrix_normalized.csv"
+  model_conf_matrix_normalized_png: "confusion_matrix_normalized.png"
+  model_accuracy_png: "model_accuracy.png"
+  model_loss_png: "model_loss.png"
+  all_samples_pred_csv: "all_samples_pred.csv"
+  model_roc_png: "model_roc.png"

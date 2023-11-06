@@ -1,25 +1,20 @@
 import os
 import uvicorn
 import traceback
-import numpy as np
-from urllib.request import Request
 from fastapi import FastAPI, Response, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 import tensorflow as tf
-from utils import get_predicted_class, transform_image
-from torchvision import models
+from deep_fake_detect_app import get_gan
+from predict_utils import get_predicted_class
+from PIL import Image
 
+# curl command
+# curl -X POST -F "uploaded_file=@./person.jpg" http://localhost:8080/predict_image
 
 load_options = tf.saved_model.LoadOptions(
     experimental_io_device='/job:localhost')
 
 model = tf.saved_model.load("./model", options=load_options)
-
-
-# Make sure to set `weights` as `'IMAGENET1K_V1'` to use the pretrained weights:
-pt_model = models.densenet121(weights='IMAGENET1K_V1')
-# Since we are using our model only for inference, switch to `eval` mode:
-pt_model.eval()
 
 app = FastAPI()
 
@@ -48,29 +43,34 @@ def predict_image(uploaded_file: UploadFile, response: Response):
 
         img = uploaded_file.file.read()
 
-        predicted = get_predicted_class(img, model)
+        result, percentage, execution_time = get_predicted_class(img, model)
 
-        return predicted
-    except Exception as e:
-        traceback.print_exc()
-        response.status_code = 500
-        return f"Internal Server Error: {e}"
+        img = Image.open(uploaded_file.file)
 
+        directory = 'images/'
+        if not os.path.exists(directory):
+            os.makedirs(directory)
 
-@app.post("/predict_image_2")
-def predict_image(uploaded_file: UploadFile, response: Response):
-    try:
-        if uploaded_file.content_type not in ["image/jpeg", "image/png"]:
-            response.status_code = 400
-            return "File is Not an Image"
+        # Save the image to the specified file path
+        file_path = os.path.join(directory, uploaded_file.filename)
+        img.save(file_path)
+            
+        label, real_prob, execution_time_gan = get_gan()
 
-        img = uploaded_file.file.read()
-        tensor = transform_image(image_bytes=img)
-
-        outputs = model.forward(tensor)
-        _, y_hat = outputs.max(1)
-        return y_hat
-
+        return [
+            {
+                "metode": "Auto Encoder",
+                "result": result,
+                "akurasi": percentage,
+                "waktu": execution_time,
+            },
+            {
+                "metode": "GAN",
+                "result": label,
+                "akurasi": f"{real_prob:.2f}%",
+                "waktu": execution_time_gan,
+            }
+        ]
     except Exception as e:
         traceback.print_exc()
         response.status_code = 500
