@@ -38,6 +38,7 @@ def index():
 def predict_image(uploaded_file: UploadFile, response: Response):
     try:
         if uploaded_file.content_type not in ["image/jpeg", "image/png"]:
+            print(uploaded_file.content_type)
             response.status_code = 400
             return "File is Not an Image"
 
@@ -55,7 +56,7 @@ def predict_image(uploaded_file: UploadFile, response: Response):
         file_path = os.path.join(directory, uploaded_file.filename)
         img.save(file_path)
             
-        label, real_prob, execution_time_gan = get_gan()
+        label, real_prob, execution_time_gan = get_gan(file_path)
 
         return [
             {

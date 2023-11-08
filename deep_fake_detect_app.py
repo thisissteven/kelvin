@@ -132,9 +132,10 @@ def predict_deepfake(input_videofile, df_method, debug=True, verbose=False):
             print(f'fake_prob = {round(fake_prob * 100, 4)}%, real_prob = {round(real_prob * 100, 4)}%  pred={pred}')
         return fake_prob, real_prob, pred
 
-def get_gan(input_videofile = "images/person.jpg", method = "MRI"):
+def get_gan(input_videofile, method = "MRI"):
     print_line()
     start = time.time()
+    
     debug = True
     verbose = True
 
@@ -159,11 +160,7 @@ def get_gan(input_videofile = "images/person.jpg", method = "MRI"):
     execution_time = end - start
     execution_time = f"{execution_time:.2f} detik"
 
-
-    if label == "REAL":
-        return label, real_prob * 100, execution_time
-    else:
-        return label, (100 - real_prob) * 100, execution_time
+    return label, probability, execution_time
 
 
 def individual_test():
